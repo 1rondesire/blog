@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xzq.blog.mapper.TagMapper">
+
+    <resultMap id="BaseResultMap" type="com.xzq.blog.pojo.Tag">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+            <result property="tagName" column="tag_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,avatar,tag_name
+    </sql>
+<!--    List<Tag> findTagsByArticle(Long articleId); 获取一个文章的所有标签-->
+    <select id="findTagsByArticle" parameterType="long" resultMap="BaseResultMap">
+        select id,avatar,tag_name from ms_tag where id in
+                            (select tag_id from ms_article_tag where article_id = #{articleId})
+    </select>
+<!--    List<Long> findHotsTagIds(int limit); 获取最热的limit个标签-->
+    <select id="findHotsTagIds" resultType="java.lang.Long">
+        SELECT tag_id FROM ms_article_tag GROUP BY tag_id ORDER BY COUNT(*) DESC LIMIT #{limit}
+    </select>
+<!--    List<Tag> findTagsByTagIds(List<Long> tagIds);-->
+    <select id="findTagsByTagIds" parameterType="list" resultType="com.xzq.blog.pojo.Tag">
+        select id,tag_name from ms_tag where id in
+        <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
+            #{tagId}
+        </foreach>
+    </select>
+
+</mapper>
