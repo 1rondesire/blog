@@ -19,6 +19,7 @@ import com.xzq.blog.utils.UserThreadLocal;
 import com.xzq.blog.vo.*;
 import com.xzq.blog.vo.params.ArticleParam;
 import com.xzq.blog.vo.params.PageParams;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     private ThreadService threadService;
     @Autowired
     private ArticleTagMapper articleTagMapper;
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
 
     @Override
     public List<ArticleVo> listArticle(PageParams pageParams) {
@@ -223,6 +226,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
         Map<String, String> map = new HashMap<>();
         //不使用tostring可能会造成精度损失
         map.put("id",article.getId().toString());
+
+        if(isEdit){
+            ArticleMessage articleMessage = new ArticleMessage();
+            articleMessage.setArticleId(article.getId());
+            rocketMQTemplate.convertAndSend("blog-update-article",articleMessage);
+        }
         return Result.success(map);
     }
 

@@ -67,9 +67,15 @@ public class CacheAspect {
             String redisValue = redisTemplate.opsForValue().get(redisKey);
             if (StringUtils.isNotEmpty(redisValue)){
                 log.info("走了缓存~~~,{},{}",className,methodName);
+                log.info("该缓存的key为:"+redisKey);
+                System.out.println(JSON.parseObject(redisValue, Result.class));
                 return JSON.parseObject(redisValue, Result.class);
             }
+
+
             Object proceed = pjp.proceed();
+
+
             redisTemplate.opsForValue().set(redisKey,JSON.toJSONString(proceed), Duration.ofMillis(expire));
             log.info("存入缓存~~~ {},{}",className,methodName);
             return proceed;

@@ -28,7 +28,7 @@
         SELECT YEAR(FROM_UNIXTIME(create_date/1000)) AS YEAR,MONTH(FROM_UNIXTIME(create_date/1000)) AS MONTH,
           COUNT(*) AS COUNT FROM ms_article GROUP BY YEAR,MONTH
     </select>
-    <select id="listArticle" resultType="com.xzq.blog.pojo.Article">
+    <select id="listArticle" resultType="com.xzq.blog.pojo.Article" >
         select * from ms_article
         <where>
             <if test="categoryId != null">

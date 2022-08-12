@@ -11,11 +11,14 @@ public class ThreadService {
 
     @Async("taskExcutor")
     public void updateArticleViewCount(ArticleMapper articleMapper, Article article){
-        Integer viewCounts = article.getViewCounts();
         Article articleupdate = new Article();
-        articleupdate.setViewCounts(viewCounts+1);
-        LambdaUpdateWrapper<Article> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Article::getId,article.getId()).eq(Article::getViewCounts,viewCounts);
-        articleMapper.update(articleupdate,updateWrapper);
+        int tag = 0;
+        while (tag == 0){
+            Integer viewCounts = article.getViewCounts();
+            articleupdate.setViewCounts(viewCounts+1);
+            LambdaUpdateWrapper<Article> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(Article::getId,article.getId()).eq(Article::getViewCounts,viewCounts);
+            tag = articleMapper.update(articleupdate, updateWrapper);
+        }
     }
 }
